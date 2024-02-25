@@ -2,10 +2,6 @@ async function appApplicationName(containerId, quizDataUrl) {
     const container = document.getElementById(containerId);
     var localResults = {};
 
-    function displayStep(step) {
-        console.log(step);
-    }
-
     async function loadSurveyFromJSON() {
         try {
             const response = await fetch(quizDataUrl);
@@ -31,27 +27,30 @@ async function appApplicationName(containerId, quizDataUrl) {
                 surveyData.options.forEach(option => {
                     const optionItem = document.createElement('li');
 
+                    const label = document.createElement('label');
                     if (surveyData.type === "Single answer") {
+
                         const radio = document.createElement('input');
                         radio.type = "radio";
                         radio.name = "answer";
                         radio.value = option;
-                        optionItem.appendChild(radio);
+                        label.appendChild(radio);
                     } else if (surveyData.type === "Multiple choice") {
                         const checkbox = document.createElement('input');
                         checkbox.type = "checkbox";
                         checkbox.name = "answer";
                         checkbox.value = option;
-                        optionItem.appendChild(checkbox);
+                        label.appendChild(checkbox);
                     }
-                    const label = document.createElement('label');
-                    label.textContent = option;
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = option;
+                    label.appendChild(labelSpan);
                     optionItem.appendChild(label);
 
                     optionsElement.appendChild(optionItem);
                 });
                 container.appendChild(optionsElement);
-                displayStep("Survey loaded, please start answering.");
+                console.log("Survey loaded, please start answering.");
 
                 localResults = {};
                 const confirmButtonDiv = document.createElement('div');
@@ -67,7 +66,7 @@ async function appApplicationName(containerId, quizDataUrl) {
                             '. Available types: "Single answer", "Multiple choice"');
             }
         } else {
-            displayStep("Error loading survey. Please try again later.");
+            console.log("Error loading survey. Please try again later.");
         }
     }
 
@@ -95,7 +94,6 @@ async function appApplicationName(containerId, quizDataUrl) {
         });
         container.appendChild(resultList);
 
-        // Adding Cancel button
         const cancelButtonDiv = document.createElement('div');
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
@@ -108,7 +106,6 @@ async function appApplicationName(containerId, quizDataUrl) {
     startSurvey();
 
     function exportButton() {
-        // Exporting results
         const exportButtonContainer = document.createElement('div');
         exportButtonContainer.classList.add('export-btn-container');
     
