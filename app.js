@@ -1,7 +1,6 @@
-var localResults = {};
-
 async function appApplicationName(containerId, quizDataUrl) {
     const container = document.getElementById(containerId);
+    var localResults = {};
 
     function displayStep(step) {
         console.log(step);
@@ -133,7 +132,6 @@ async function appApplicationName(containerId, quizDataUrl) {
             exportDropdownContent.classList.toggle('show');
         });
 
-        // Close dropdown if clicked outside of it
         document.addEventListener('click', function(event) {
             if (!exportButtonContainer.contains(event.target)) {
                 exportDropdownContent.classList.remove('show');
@@ -144,13 +142,13 @@ async function appApplicationName(containerId, quizDataUrl) {
         document.getElementById("export-json").addEventListener("click", exportJSON);
     
         function exportCSV() {
-            // Logic to export results in CSV format
+            // TODO Logic to export results in CSV format
             console.log("Exporting results as CSV...");
             exportDropdownContent.classList.remove('show')
         }
     
         function exportJSON() {
-            // Logic to export results in JSON format
+            // TODO Logic to export results in JSON format
             console.log("Exporting results as JSON...");
             exportDropdownContent.classList.remove('show')
         }
