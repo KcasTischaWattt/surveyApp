@@ -1,0 +1,10 @@
+{
+    "question": "What is your favorite color?",
+    "type" : "Multiple choice",
+    "options": [
+        "Red",
+        "Blue",
+        "Green",
+        "Yellow"
+    ]
+}
