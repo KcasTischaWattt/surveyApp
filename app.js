@@ -187,9 +187,5 @@ async function appApplicationName(containerId, quizDataUrl) {
             exportDropdownContent.classList.remove('show')
         }
     } 
-    
-    function addMockData() {
-
-    }
 
 }
