@@ -121,6 +121,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         cancelButton.addEventListener('click', cancelButtonFunc);
         cancelButtonDiv.appendChild(cancelButton);
         container.appendChild(cancelButtonDiv);
+        exportButton();
     }
 
     function seeResultsButton() {
@@ -139,7 +140,6 @@ async function appApplicationName(containerId, quizDataUrl) {
         localStorage["pollResults"] = JSON.stringify({});
         //TODO Delete voice from airtable
         startSurvey();
-        //exportButton();
     }
 
     function exportButton() {
