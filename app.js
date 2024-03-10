@@ -1,6 +1,5 @@
 async function appApplicationName(containerId, quizDataUrl) {
     const container = document.getElementById(containerId);
-    var localResults = {};
 
     async function loadSurveyFromJSON() {
         try {
@@ -50,17 +49,25 @@ async function appApplicationName(containerId, quizDataUrl) {
                     optionsElement.appendChild(optionItem);
                 });
                 container.appendChild(optionsElement);
+                if (!("pollResults" in localStorage)) {
+                    localStorage["pollResults"] = JSON.stringify({});
+                }
                 console.log("Survey loaded, please start answering.");
 
-                localResults = {};
-                const confirmButtonDiv = document.createElement('div');
-                const confirmButton = document.createElement('button');
-                confirmButton.textContent = 'See results';
-                confirmButton.addEventListener('click', calculateResults);
-                confirmButtonDiv.appendChild(confirmButton);
-                container.appendChild(confirmButtonDiv);
-                
-                exportButton(); 
+                let pollResults = JSON.parse(localStorage["pollResults"]);
+                let totalCount = 0;
+                if (pollResults != {}) {
+                    Object.values(pollResults).forEach( num => {
+                        totalCount += num;
+                    })
+                }
+                if (totalCount > 0) {
+                    displayResults(pollResults);
+                    showCancelButton();
+                } else {
+                    seeResultsButton();
+                    exportButton();
+                } 
             } else {
                 console.log('Error fetching survey type:', surveyData.type,
                             '. Available types: "Single answer", "Multiple choice"');
@@ -72,11 +79,14 @@ async function appApplicationName(containerId, quizDataUrl) {
 
     function calculateResults() {
         const options = document.querySelectorAll('input[name="answer"]');
+        let pollResults = JSON.parse(localStorage["pollResults"]);
         options.forEach(option => {
-            const percentage = option.checked ? 100 : 0;
-            localResults[option.value] = percentage;
+            const res = option.checked ? 1 : 0;
+            pollResults[option.value] = res;
         });
-        displayResults(localResults);
+        // Write to Airtable
+        localStorage["pollResults"] = JSON.stringify(pollResults);
+        displayResults(pollResults);
     }
 
     function displayResults(results) {
@@ -86,24 +96,51 @@ async function appApplicationName(containerId, quizDataUrl) {
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
 
+        // Read from Airtable
+        let pollResults = JSON.parse(localStorage["pollResults"]);
+        console.log(pollResults);
         const resultList = document.createElement('ul');
-        Object.entries(results).forEach(([option, percentage]) => {
+        let totalCount = 0;
+        Object.values(pollResults).forEach( num => {
+            totalCount += num;
+          })
+        Object.entries(results).forEach(([option, res]) => {
             const resultItem = document.createElement('li');
+            const percentage = totalCount == 0 ? 0 : Math.round(res/totalCount * 100);
             resultItem.textContent = `${option}: ${percentage}%`;
             resultList.appendChild(resultItem);
         });
-        container.appendChild(resultList);
+        container.appendChild(resultList); 
+        
+    }
 
+    function showCancelButton() {
         const cancelButtonDiv = document.createElement('div');
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
-        cancelButton.addEventListener('click', startSurvey);
+        cancelButton.addEventListener('click', cancelButtonFunc);
         cancelButtonDiv.appendChild(cancelButton);
         container.appendChild(cancelButtonDiv);
-        exportButton();
+    }
+
+    function seeResultsButton() {
+        const confirmButtonDiv = document.createElement('div');
+        const confirmButton = document.createElement('button');
+        confirmButton.textContent = 'See results';
+        confirmButton.addEventListener('click', calculateResults);
+        confirmButton.addEventListener('click', showCancelButton);
+        confirmButtonDiv.appendChild(confirmButton);
+        container.appendChild(confirmButtonDiv);
     }
 
     startSurvey();
+
+    function cancelButtonFunc() {
+        localStorage["pollResults"] = JSON.stringify({});
+        //TODO Delete voice from airtable
+        startSurvey();
+        //exportButton();
+    }
 
     function exportButton() {
         const exportButtonContainer = document.createElement('div');
@@ -149,6 +186,10 @@ async function appApplicationName(containerId, quizDataUrl) {
             console.log("Exporting results as JSON...");
             exportDropdownContent.classList.remove('show')
         }
-    }  
+    } 
+    
+    function addMockData() {
+
+    }
 
 }
