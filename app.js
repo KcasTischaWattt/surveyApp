@@ -100,6 +100,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         let pollResults = JSON.parse(localStorage["pollResults"]);
         console.log(pollResults);
         const resultList = document.createElement('ul');
+        // Total count would be stored in Airtable
         let totalCount = 0;
         Object.values(pollResults).forEach(num => {
             totalCount += num;
@@ -141,7 +142,7 @@ async function appApplicationName(containerId, quizDataUrl) {
 
     function cancelButtonFunc() {
         localStorage["pollResults"] = JSON.stringify({});
-        //TODO Delete voice from airtable
+        //TODO Delete from airtable
         startSurvey();
     }
 
@@ -181,13 +182,11 @@ async function appApplicationName(containerId, quizDataUrl) {
         function exportCSV() {
             // TODO Logic to export results in CSV format
             console.log("Exporting results as CSV...");
-            exportDropdownContent.classList.remove('show')
         }
     
         function exportJSON() {
             // TODO Logic to export results in JSON format
             console.log("Exporting results as JSON...");
-            exportDropdownContent.classList.remove('show')
         }
     } 
 
