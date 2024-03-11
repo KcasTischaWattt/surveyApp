@@ -91,27 +91,30 @@ async function appApplicationName(containerId, quizDataUrl) {
 
     function displayResults(results) {
         container.innerHTML = '';
-
+    
         const resultsElement = document.createElement('div');
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
-
+    
         // Read from Airtable
         let pollResults = JSON.parse(localStorage["pollResults"]);
         console.log(pollResults);
         const resultList = document.createElement('ul');
         let totalCount = 0;
-        Object.values(pollResults).forEach( num => {
+        Object.values(pollResults).forEach(num => {
             totalCount += num;
-          })
+        })
         Object.entries(results).forEach(([option, res]) => {
             const resultItem = document.createElement('li');
-            const percentage = totalCount == 0 ? 0 : Math.round(res/totalCount * 100);
-            resultItem.textContent = `${option}: ${percentage}%`;
+            const percentage = totalCount == 0 ? 0 : Math.round(res / totalCount * 100);
+            if (pollResults[option] !== 0) {
+                resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
+            } else {
+                resultItem.textContent = `${option}: ${percentage}%`;
+            }
             resultList.appendChild(resultItem);
         });
-        container.appendChild(resultList); 
-        
+        container.appendChild(resultList);
     }
 
     function showCancelButton() {
