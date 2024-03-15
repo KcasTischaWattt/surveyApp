@@ -9,7 +9,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         } catch (error) {
             console.error('Error fetching survey:', error);
             return null;
-        }
+        }   
     }
 
     async function startSurvey() {
@@ -28,7 +28,6 @@ async function appApplicationName(containerId, quizDataUrl) {
 
                     const label = document.createElement('label');
                     if (surveyData.type === "Single answer") {
-
                         const radio = document.createElement('input');
                         radio.type = "radio";
                         radio.name = "answer";
@@ -67,6 +66,7 @@ async function appApplicationName(containerId, quizDataUrl) {
                 } else {
                     seeResultsButton();
                     exportButton();
+                    showReportForm()
                 } 
             } else {
                 console.log('Error fetching survey type:', surveyData.type,
@@ -126,6 +126,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         cancelButtonDiv.appendChild(cancelButton);
         container.appendChild(cancelButtonDiv);
         exportButton();
+        showReportForm();
     }
 
     function seeResultsButton() {
@@ -136,6 +137,16 @@ async function appApplicationName(containerId, quizDataUrl) {
         confirmButton.addEventListener('click', showCancelButton);
         confirmButtonDiv.appendChild(confirmButton);
         container.appendChild(confirmButtonDiv);
+    }
+
+    function showReportButton() {
+        const reportButtonDiv = document.createElement('div');
+        const reportButton = document.createElement('button');
+        reportButton.textContent = 'Report';
+        const popUp = document.createElement('div');
+        reportButton.addEventListener('click', showReportForm());
+        reportButtonDiv.appendChild(reportButton);
+        container.appendChild(reportButtonDiv);
     }
 
     startSurvey();
@@ -188,6 +199,73 @@ async function appApplicationName(containerId, quizDataUrl) {
             // TODO Logic to export results in JSON format
             console.log("Exporting results as JSON...");
         }
-    } 
+    }
+    
+    function showReportForm() { 
+        const reportButtonDiv = document.createElement('div');
+        const reportButton = document.createElement('button');
+        reportButton.textContent = 'Report';
+        const popUp = document.createElement('div');
+        popUp.className = 'popUp';
+        reportButton.addEventListener('click', function() {
+            popUp.style.visibility = "visible";
+        });
+        reportButtonDiv.appendChild(reportButton);
+        container.appendChild(reportButtonDiv);
+        container.appendChild(popUp);
+
+        const popUpContent = document.createElement('div');
+        popUpContent.className = 'popUpContent';
+        popUp.appendChild(popUpContent);
+
+        const feedbackTitle = document.createElement('div');
+        feedbackTitle.classList.add('feedback-title');
+        feedbackTitle.textContent = "Report form";
+        popUpContent.appendChild(feedbackTitle);
+    
+        const closeButton = document.createElement('button');
+        closeButton.classList.add('close-button');
+        closeButton.innerHTML = '&times;';
+        closeButton.onclick = function() {
+            popUp.style.visibility = 'hidden';
+        };
+        feedbackTitle.appendChild(closeButton);
+    
+        const feedbackForm = document.createElement('div');
+        feedbackForm.classList.add('feedback-form');
+    
+        const feedbackInput = document.createElement('textarea');
+        feedbackInput.classList.add('feedback-input');
+        feedbackInput.placeholder = 'Your Report...';
+        feedbackForm.appendChild(feedbackInput);
+    
+        const submitButton = document.createElement('button');
+        submitButton.classList.add('submit-button');
+        submitButton.textContent = 'Send';
+        submitButton.onclick = function() {
+            var feedback = feedbackInput.value.trim();
+            if (feedback === '') {
+                alert('Please enter ypur report');
+                return;
+            }
+
+            fetch('', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'feedback=' + encodeURIComponent(feedback)
+            }).then(response => {
+                alert('Report has successefully sent!');
+                popUp.style.visibility = 'hidden';
+            }).catch(error => {
+                console.error('An error occured: ', error);
+            });
+        };        
+        popUpContent.appendChild(feedbackForm);
+        popUpContent.appendChild(submitButton);
+    }
+
 
 }
