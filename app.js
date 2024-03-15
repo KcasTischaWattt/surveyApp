@@ -208,7 +208,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         const popUp = document.createElement('div');
         popUp.className = 'popUp';
         reportButton.addEventListener('click', function() {
-            popUp.style.visibility = "visible";
+            popUp.classList.add('show');
         });
         reportButtonDiv.appendChild(reportButton);
         container.appendChild(reportButtonDiv);
@@ -227,7 +227,7 @@ async function appApplicationName(containerId, quizDataUrl) {
         closeButton.classList.add('close-button');
         closeButton.innerHTML = '&times;';
         closeButton.onclick = function() {
-            popUp.style.visibility = 'hidden';
+            popUp.classList.remove('show');
         };
         feedbackTitle.appendChild(closeButton);
     
@@ -258,7 +258,7 @@ async function appApplicationName(containerId, quizDataUrl) {
                 body: 'feedback=' + encodeURIComponent(feedback)
             }).then(response => {
                 alert('Report has successefully sent!');
-                popUp.style.visibility = 'hidden';
+                popUp.classList.remove('show');
             }).catch(error => {
                 console.error('An error occured: ', error);
             });
