@@ -11,16 +11,16 @@
     margin-bottom: 15px;
   }
   
-  ul {
+  .my_ul {
     list-style-type: none;
     padding: 0;
   }
   
-  li {
+  .my_li {
     margin-bottom: 10px;
   }
   
-  label {
+  .mylabel {
     display: block;
     padding: 5px;
     background-color: #fff;
@@ -29,15 +29,15 @@
     cursor: pointer;
   }
   
-  label:hover {
+  .mylabel:hover {
     background-color: #f0f0f0;
   }
   
-  input[type="radio"] {
+  .myinput[type="radio"] {
     margin-right: 10px;
   }
   
-  button {
+  .btn {
     background-color: #007bff;
     color: white;
     border: none;
@@ -47,7 +47,7 @@
     font-size: 16px;
   }
   
-  button:hover {
+  .btn:hover {
     background-color: #0056b3;
   }
   

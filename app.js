@@ -24,12 +24,17 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                 container.appendChild(questionElement);
 
                 const optionsElement = document.createElement('ul');
+                optionsElement.className = 'my_ul';
+
                 surveyData.options.forEach(option => {
                     const optionItem = document.createElement('li');
+                    optionItem.className = 'my_li';
 
                     const label = document.createElement('label');
+                    label.className = 'mylabel';
                     if (surveyData.type === "Single answer") {
                         const radio = document.createElement('input');
+                        radio.className = 'myinput';
                         radio.type = "radio";
                         radio.name = "answer";
                         radio.value = option;
@@ -65,7 +70,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                     showCancelButton();
                 } else {
                     seeResultsButton();
-                    exportButton();
+                    showExportButton();
                     showReportForm()
                 } 
             } else {
@@ -108,6 +113,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
 
         let data = await getSurveyResultsFromGoogleSheets()
         const resultList = document.createElement('ul');
+        resultList.className = 'my_ul';
 
         let totalCount = 0;
         let pollResults = JSON.parse(localStorage["pollResults"]);
@@ -124,6 +130,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
 
         data.forEach(({ option, count }) => {
             const resultItem = document.createElement('li');
+            resultItem.className = 'my_li';
             let add = 0;
             if (res != "1") {
                 add = res[option];
@@ -142,17 +149,19 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
     async function showCancelButton() {
         const cancelButtonDiv = document.createElement('div');
         const cancelButton = document.createElement('button');
+        cancelButton.classList.add('btn');
         cancelButton.textContent = 'Cancel';
         cancelButton.addEventListener('click', cancelButtonFunc);
         cancelButtonDiv.appendChild(cancelButton);
         container.appendChild(cancelButtonDiv);
-        exportButton();
+        showExportButton();
         showReportForm();
     }
 
     function seeResultsButton() {
         const confirmButtonDiv = document.createElement('div');
         const confirmButton = document.createElement('button');
+        confirmButton.classList.add('btn');
         confirmButton.textContent = 'See results';
         confirmButton.addEventListener('click', calculateResults);
         confirmButtonDiv.appendChild(confirmButton);
@@ -168,11 +177,12 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         startSurvey();
     }
 
-    function exportButton() {
+    function showExportButton() {
         const exportButtonContainer = document.createElement('div');
         exportButtonContainer.classList.add('export-btn-container');
     
         const exportButton = document.createElement('button');
+        exportButton.classList.add('btn');
         exportButton.textContent = 'Export results';
         exportButton.classList.add('dropbtn');
         exportButtonContainer.appendChild(exportButton);
@@ -233,6 +243,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
     function showReportForm() { 
         const reportButtonDiv = document.createElement('div');
         const reportButton = document.createElement('button');
+        reportButton.classList.add('btn');
         reportButton.textContent = 'Report';
         const popUp = document.createElement('div');
         popUp.className = 'popUp';
@@ -253,6 +264,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         popUpContent.appendChild(feedbackTitle);
     
         const closeButton = document.createElement('button');
+        closeButton.classList.add('btn');
         closeButton.classList.add('close-button');
         closeButton.innerHTML = '&times;';
         closeButton.onclick = function() {
@@ -269,6 +281,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         feedbackForm.appendChild(feedbackInput);
     
         const submitButton = document.createElement('button');
+        submitButton.classList.add('btn');
         submitButton.classList.add('submit-button');
         submitButton.textContent = 'Send';
         submitButton.onclick = function() {
@@ -325,7 +338,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                 const data = await response.json();
                 return data;
             } else {
-                console.error('Error_ getting survey results:', response.statusText);
+                console.error('Error getting survey results:', response.statusText);
             }
         } catch (error) {
             console.error('Error getting survey results:', error);
