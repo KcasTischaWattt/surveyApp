@@ -124,8 +124,14 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
             }
         });
 
+        let resSum = 0;
+
         if (res != "1") {
-            totalCount++;
+            Object.values(res).forEach(val => resSum += val);
+            totalCount += resSum;
+            if (resSum > 0) {
+                totalCount++;
+            }
         }
 
         data.forEach(({ option, count }) => {
@@ -135,7 +141,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
                 if (res != "1") {
                     add = res[option];
                 }
-                const percentage = totalCount === 0 ? 0 : Math.round((count + add / totalCount) * 100);
+                const percentage = totalCount === 0 ? 0 : Math.round(((count + add) / totalCount) * 100);
                 if (pollResults[option] !== 0) {
                     resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
                 } else {
