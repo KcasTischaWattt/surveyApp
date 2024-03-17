@@ -191,8 +191,8 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         exportDropdownContent.id = 'export-dropdown-content';
         exportDropdownContent.classList.add('dropdown-content');
         exportDropdownContent.innerHTML = `
-            <button id="export-csv">Export CSV</button>
-            <button id="export-json">Export JSON</button>
+            <button id="export-csv" class="btn">Export CSV</button>
+            <button id="export-json" class="btn">Export JSON</button>
         `;
         exportButtonContainer.appendChild(exportDropdownContent);
     
