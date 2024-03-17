@@ -1,4 +1,4 @@
-async function appApplicationName(containerId, quizDataUrl, reportTableURL, resultsTableURL) {
+async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTableURL) {
     const container = document.getElementById(containerId);
 
     let options = [];
@@ -83,27 +83,24 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
     async function calculateResults() {
         const options_ = document.querySelectorAll('input[name="answer"]');
         let pollResults = JSON.parse(localStorage["pollResults"]);
+        let sum = 0;
         options_.forEach(option => {
             const res = option.checked ? 1 : 0;
+            sum += res;
             pollResults[option.value] = res;
         });
         localStorage["pollResults"] = JSON.stringify(pollResults);
         await displayResults(pollResults);
-        await writeResultsInGoogleSheets(pollResults, 1);
+        await writeResultsInGoogleSheets(pollResults, 1, 1/sum);
         await showCancelButton();
     }
 
-    async function writeResultsInGoogleSheets(pollResults, value) {
+    async function writeResultsInGoogleSheets(pollResults, value, tc) {
         Object.entries(pollResults).forEach(([option, res]) => {
             if (res > 0) {
-                updateGoogleSheets(option, value);
+                updateGoogleSheets(option, value, tc);
             } 
         });
-    }
-
-    async function parseResults() {
-        let data = await getSurveyResultsFromGoogleSheets()
-        return data;
     }
 
     async function displayResults(res) {
@@ -120,7 +117,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
 
         data.forEach(({ option, count }) => {
             if (option === "Total") {
-                totalCount = count;
+                totalCount = Math.round(count);
             }
         });
 
@@ -175,7 +172,9 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
 
     function cancelButtonFunc() {
         let pollResults = JSON.parse(localStorage["pollResults"]);
-        writeResultsInGoogleSheets(pollResults, -1);
+        let sum = 0;
+        Object.values(pollResults).forEach(val => sum += val);
+        writeResultsInGoogleSheets(pollResults, -1, -1 / sum);
         localStorage["pollResults"] = JSON.stringify({});
         startSurvey();
     }
@@ -290,11 +289,12 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         popUpContent.appendChild(submitButton);
     }
 
-    async function updateGoogleSheets(option, voteValue) {
+    async function updateGoogleSheets(option, voteValue, totalCount) {
         const url = resultsTableURL;
         const data = {
             option: option,
-            voteValue: voteValue
+            voteValue: voteValue,
+            totalCount: totalCount
         };
     
         try {
