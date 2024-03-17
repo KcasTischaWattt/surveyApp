@@ -91,14 +91,14 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         });
         localStorage["pollResults"] = JSON.stringify(pollResults);
         await displayResults(pollResults);
-        await writeResultsInGoogleSheets(pollResults, 1, 1/sum);
+        await writeResultsInGoogleSheets(pollResults, 1);
         await showCancelButton();
     }
 
-    async function writeResultsInGoogleSheets(pollResults, value, tc) {
+    async function writeResultsInGoogleSheets(pollResults, value) {
         Object.entries(pollResults).forEach(([option, res]) => {
             if (res > 0) {
-                updateGoogleSheets(option, value, tc);
+                updateGoogleSheets(option, value);
             } 
         });
     }
@@ -112,40 +112,39 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         let data = await getSurveyResultsFromGoogleSheets()
         const resultList = document.createElement('ul');
 
-        let totalCount = 1;
+        let totalCount = 0;
         let pollResults = JSON.parse(localStorage["pollResults"]);
 
-        data.forEach(({ option, count }) => {
-            if (option === "Total") {
-                totalCount = Math.round(count);
-            }
+        data.forEach(({ _, count }) => {
+            totalCount += count;
         });
 
         let resSum = 0;
 
+        console.log(totalCount);
+
         if (res != "1") {
             Object.values(res).forEach(val => resSum += val);
-            totalCount += resSum;
             if (resSum > 0) {
                 totalCount++;
             }
         }
 
+        console.log(totalCount);
+
         data.forEach(({ option, count }) => {
-            if (option !== "Total") {
-                const resultItem = document.createElement('li');
-                let add = 0;
-                if (res != "1") {
-                    add = res[option];
-                }
-                const percentage = totalCount === 0 ? 0 : Math.round(((count + add) / totalCount) * 100);
-                if (pollResults[option] !== 0) {
-                    resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
-                } else {
-                    resultItem.textContent = `${option}: ${percentage}%`;
-                }
-                resultList.appendChild(resultItem);
+            const resultItem = document.createElement('li');
+            let add = 0;
+            if (res != "1") {
+                add = res[option];
             }
+            const percentage = totalCount === 0 ? 0 : Math.round(((count + add) / totalCount) * 100);
+            if (pollResults[option] !== 0) {
+                resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
+            } else {
+                resultItem.textContent = `${option}: ${percentage}%`;
+            }
+            resultList.appendChild(resultItem);
         });
         container.appendChild(resultList);
     }
@@ -174,7 +173,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         let pollResults = JSON.parse(localStorage["pollResults"]);
         let sum = 0;
         Object.values(pollResults).forEach(val => sum += val);
-        writeResultsInGoogleSheets(pollResults, -1, -1 / sum);
+        writeResultsInGoogleSheets(pollResults, -1);
         localStorage["pollResults"] = JSON.stringify({});
         startSurvey();
     }
@@ -289,12 +288,11 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         popUpContent.appendChild(submitButton);
     }
 
-    async function updateGoogleSheets(option, voteValue, totalCount) {
+    async function updateGoogleSheets(option, voteValue ) {
         const url = resultsTableURL;
         const data = {
             option: option,
             voteValue: voteValue,
-            totalCount: totalCount
         };
     
         try {
