@@ -52,7 +52,6 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                 if (!("pollResults" in localStorage)) {
                     localStorage["pollResults"] = JSON.stringify({});
                 }
-                console.log("Survey loaded, please start answering.");
 
                 let pollResults = JSON.parse(localStorage["pollResults"]);
                 let totalCount = 0;
@@ -70,11 +69,11 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                     showReportForm()
                 } 
             } else {
-                console.log('Error fetching survey type:', surveyData.type,
+                console.error('Error fetching survey type:', surveyData.type,
                             '. Available types: "Single answer", "Multiple choice"');
             }
         } else {
-            console.log("Error loading survey. Please try again later.");
+            console.error("Error loading survey. Please try again later.");
         }
     }
 
@@ -216,14 +215,11 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            console.log("Exporting results as CSV...");
         }
     
         async function exportJSON() {
             let data = await getSurveyResultsFromGoogleSheets();
-            console.log(data);
             let jsonData = JSON.stringify(data);
-            console.log(jsonData);
             const blob = new Blob([jsonData], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(blob);
@@ -231,7 +227,6 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            console.log("Exporting results as JSON...");
         }
     }
     
@@ -326,10 +321,8 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         const url = resultsTableURL;
         try {
             const response = await fetch(url);
-            //console.log(response);
             if (response.ok) {
                 const data = await response.json();
-                console.log(data)
                 return data;
             } else {
                 console.error('Error_ getting survey results:', response.statusText);
