@@ -120,17 +120,10 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         });
 
         let resSum = 0;
-
-        console.log(totalCount);
-
         if (res != "1") {
             Object.values(res).forEach(val => resSum += val);
-            if (resSum > 0) {
-                totalCount++;
-            }
+            totalCount += resSum;
         }
-
-        console.log(totalCount);
 
         data.forEach(({ option, count }) => {
             const resultItem = document.createElement('li');
