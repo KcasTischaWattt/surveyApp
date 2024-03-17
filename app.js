@@ -1,8 +1,6 @@
 async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTableURL) {
     const container = document.getElementById(containerId);
 
-    let options = [];
-
     async function loadSurveyFromJSON() {
         try {
             const response = await fetch(quizDataUrl);
@@ -204,13 +202,35 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         document.getElementById("export-csv").addEventListener("click", exportCSV);
         document.getElementById("export-json").addEventListener("click", exportJSON);
     
-        function exportCSV() {
-            // TODO Logic to export results in CSV format
+        async function exportCSV() {
+            let data = await getSurveyResultsFromGoogleSheets();
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += Object.keys(data[0]).join(",") + "\n";
+            data.forEach(entry => {
+                csvContent += Object.values(entry).join(",") + "\n";
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = 'survey_results.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             console.log("Exporting results as CSV...");
         }
     
-        function exportJSON() {
-            // TODO Logic to export results in JSON format
+        async function exportJSON() {
+            let data = await getSurveyResultsFromGoogleSheets();
+            console.log(data);
+            let jsonData = JSON.stringify(data);
+            console.log(jsonData);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = 'survey_results.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             console.log("Exporting results as JSON...");
         }
     }
