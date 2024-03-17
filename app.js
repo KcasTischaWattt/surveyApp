@@ -64,7 +64,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
                     })
                 }
                 if (totalCount > 0) {
-                    await displayResults(pollResults);
+                    await displayResults("1");
                     showCancelButton();
                 } else {
                     seeResultsButton();
@@ -102,23 +102,21 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
     }
 
     async function parseResults() {
-        var data = await getSurveyResultsFromGoogleSheets();
+        let data = await getSurveyResultsFromGoogleSheets()
+        return data;
     }
 
-    async function displayResults(results) {
+    async function displayResults(res) {
         container.innerHTML = '';
-    
         const resultsElement = document.createElement('div');
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
 
-        //var res = '[{"option":"Red","count":0},{"option":"Blue","count":0},{"option":"Green","count":0},{"option":"Black","count":1},{"option":"Total","count":1}]';
-        //console.log(res);
-        //var data = JSON.parse(res) || [];
-
-        var data = await getSurveyResultsFromGoogleSheets();
+        let data = await getSurveyResultsFromGoogleSheets()
         const resultList = document.createElement('ul');
+
         let totalCount = 1;
+        let pollResults = JSON.parse(localStorage["pollResults"]);
 
         data.forEach(({ option, count }) => {
             if (option === "Total") {
@@ -126,13 +124,19 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
             }
         });
 
-        console.log(totalCount);
+        if (res != "1") {
+            totalCount++;
+        }
 
         data.forEach(({ option, count }) => {
             if (option !== "Total") {
                 const resultItem = document.createElement('li');
-                const percentage = totalCount === 0 ? 0 : Math.round(count / totalCount * 100);
-                if (results[option] !== 0) {
+                let add = 0;
+                if (res != "1") {
+                    add = res[option];
+                }
+                const percentage = totalCount === 0 ? 0 : Math.round((count + add / totalCount) * 100);
+                if (pollResults[option] !== 0) {
                     resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
                 } else {
                     resultItem.textContent = `${option}: ${percentage}%`;
