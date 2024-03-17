@@ -64,7 +64,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
                     })
                 }
                 if (totalCount > 0) {
-                    displayResults(pollResults);
+                    await displayResults(pollResults);
                     showCancelButton();
                 } else {
                     seeResultsButton();
@@ -88,16 +88,21 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
             pollResults[option.value] = res;
         });
         localStorage["pollResults"] = JSON.stringify(pollResults);
-        await writeResultsInGoogleSheets(pollResults, 1);
         await displayResults(pollResults);
+        await writeResultsInGoogleSheets(pollResults, 1);
+        await showCancelButton();
     }
 
     async function writeResultsInGoogleSheets(pollResults, value) {
-        Object.entries(pollResults).forEach(async ([option, res]) => {
+        Object.entries(pollResults).forEach(([option, res]) => {
             if (res > 0) {
-                await updateGoogleSheets(option, value);
+                updateGoogleSheets(option, value);
             } 
         });
+    }
+
+    async function parseResults() {
+        var data = await getSurveyResultsFromGoogleSheets();
     }
 
     async function displayResults(results) {
@@ -106,15 +111,22 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         const resultsElement = document.createElement('div');
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
-    
-        var data = await getSurveyResultsFromGoogleSheets();
+
         //var res = '[{"option":"Red","count":0},{"option":"Blue","count":0},{"option":"Green","count":0},{"option":"Black","count":1},{"option":"Total","count":1}]';
         //console.log(res);
         //var data = JSON.parse(res) || [];
 
+        var data = await getSurveyResultsFromGoogleSheets();
         const resultList = document.createElement('ul');
-        const totalCount = 1;
-       // const totalCount = data.find(opt => opt.option === 'Total').count;
+        let totalCount = 1;
+
+        data.forEach(({ option, count }) => {
+            if (option === "Total") {
+                totalCount = count;
+            }
+        });
+
+        console.log(totalCount);
 
         data.forEach(({ option, count }) => {
             if (option !== "Total") {
@@ -131,7 +143,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         container.appendChild(resultList);
     }
 
-    function showCancelButton() {
+    async function showCancelButton() {
         const cancelButtonDiv = document.createElement('div');
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
@@ -147,12 +159,9 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         const confirmButton = document.createElement('button');
         confirmButton.textContent = 'See results';
         confirmButton.addEventListener('click', calculateResults);
-        confirmButton.addEventListener('click', showCancelButton);
         confirmButtonDiv.appendChild(confirmButton);
         container.appendChild(confirmButtonDiv);
     }
-
-    startSurvey();
 
     function cancelButtonFunc() {
         let pollResults = JSON.parse(localStorage["pollResults"]);
@@ -309,4 +318,5 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         }
     }
 
+    startSurvey();
 }
