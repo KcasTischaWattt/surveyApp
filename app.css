@@ -1,4 +1,4 @@
-#survey-container {
+.survey-container {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     padding: 20px;
@@ -7,7 +7,7 @@
     margin: auto;
   }
   
-  #survey-container div {
+  .survey-container div {
     margin-bottom: 15px;
   }
   
