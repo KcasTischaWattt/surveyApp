@@ -80,7 +80,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         }
     }
 
-    function calculateResults() {
+    async function calculateResults() {
         const options_ = document.querySelectorAll('input[name="answer"]');
         let pollResults = JSON.parse(localStorage["pollResults"]);
         options_.forEach(option => {
@@ -88,32 +88,33 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
             pollResults[option.value] = res;
         });
         localStorage["pollResults"] = JSON.stringify(pollResults);
-        writeResultsInGoogleSheets(pollResults, 1);
-        displayResults(pollResults);
+        await writeResultsInGoogleSheets(pollResults, 1);
+        await displayResults(pollResults);
     }
 
-    function writeResultsInGoogleSheets(pollResults, value) {
-        Object.entries(pollResults).forEach(([option, res]) => {
+    async function writeResultsInGoogleSheets(pollResults, value) {
+        Object.entries(pollResults).forEach(async ([option, res]) => {
             if (res > 0) {
-                updateGoogleSheets(option, value);
+                await updateGoogleSheets(option, value);
             } 
         });
     }
 
-    function displayResults(results) {
+    async function displayResults(results) {
         container.innerHTML = '';
     
         const resultsElement = document.createElement('div');
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
     
-        //var res = getSurveyResultsFromGoogleSheets();
-        var res = '[{"option":"Red","count":0},{"option":"Blue","count":0},{"option":"Green","count":0},{"option":"Black","count":1},{"option":"Total","count":1}]';
+        var data = await getSurveyResultsFromGoogleSheets();
+        //var res = '[{"option":"Red","count":0},{"option":"Blue","count":0},{"option":"Green","count":0},{"option":"Black","count":1},{"option":"Total","count":1}]';
         //console.log(res);
-        var data = JSON.parse(res);
+        //var data = JSON.parse(res) || [];
 
         const resultList = document.createElement('ul');
-        const totalCount = data.find(opt => opt.option === 'Total').count;
+        const totalCount = 1;
+       // const totalCount = data.find(opt => opt.option === 'Total').count;
 
         data.forEach(({ option, count }) => {
             if (option !== "Total") {
@@ -149,16 +150,6 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         confirmButton.addEventListener('click', showCancelButton);
         confirmButtonDiv.appendChild(confirmButton);
         container.appendChild(confirmButtonDiv);
-    }
-
-    function showReportButton() {
-        const reportButtonDiv = document.createElement('div');
-        const reportButton = document.createElement('button');
-        reportButton.textContent = 'Report';
-        const popUp = document.createElement('div');
-        reportButton.addEventListener('click', showReportForm());
-        reportButtonDiv.appendChild(reportButton);
-        container.appendChild(reportButtonDiv);
     }
 
     startSurvey();
@@ -304,12 +295,11 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
     async function getSurveyResultsFromGoogleSheets() {
         const url = resultsTableURL;
         try {
-            const response = await fetch(url, {
-                mode: 'no-cors',
-                });
-            console.log(response);
+            const response = await fetch(url);
+            //console.log(response);
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 return data;
             } else {
                 console.error('Error_ getting survey results:', response.statusText);
