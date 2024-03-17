@@ -60,3 +60,14 @@ function doGet() {
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
+
+Таблица `ReportTable` не требует предварительного заполнения, желательно оставить её пустой.
+
+Формат таблицы `SurveyTable` должен быть следующий
+
+| Option | Result |
+|--------|--------|
+| Red    |   0    |
+| Blue   |   0    |
+| Green  |   0    |
+| Black  |   0    |
