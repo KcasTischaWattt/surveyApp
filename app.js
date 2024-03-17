@@ -1,10 +1,13 @@
-async function appApplicationName(containerId, quizDataUrl) {
+async function appApplicationName(containerId, quizDataUrl, reportTableURL, resultsTableURL) {
     const container = document.getElementById(containerId);
+
+    let options = [];
 
     async function loadSurveyFromJSON() {
         try {
             const response = await fetch(quizDataUrl);
             const data = await response.json();
+            options = data.options;
             return data;
         } catch (error) {
             console.error('Error fetching survey:', error);
@@ -78,15 +81,23 @@ async function appApplicationName(containerId, quizDataUrl) {
     }
 
     function calculateResults() {
-        const options = document.querySelectorAll('input[name="answer"]');
+        const options_ = document.querySelectorAll('input[name="answer"]');
         let pollResults = JSON.parse(localStorage["pollResults"]);
-        options.forEach(option => {
+        options_.forEach(option => {
             const res = option.checked ? 1 : 0;
             pollResults[option.value] = res;
         });
-        // Write to Airtable
         localStorage["pollResults"] = JSON.stringify(pollResults);
+        writeResultsInGoogleSheets(pollResults, 1);
         displayResults(pollResults);
+    }
+
+    function writeResultsInGoogleSheets(pollResults, value) {
+        Object.entries(pollResults).forEach(([option, res]) => {
+            if (res > 0) {
+                updateGoogleSheets(option, value);
+            } 
+        });
     }
 
     function displayResults(results) {
@@ -100,7 +111,6 @@ async function appApplicationName(containerId, quizDataUrl) {
         let pollResults = JSON.parse(localStorage["pollResults"]);
         console.log(pollResults);
         const resultList = document.createElement('ul');
-        // Total count would be stored in Airtable
         let totalCount = 0;
         Object.values(pollResults).forEach(num => {
             totalCount += num;
@@ -152,8 +162,9 @@ async function appApplicationName(containerId, quizDataUrl) {
     startSurvey();
 
     function cancelButtonFunc() {
+        let pollResults = JSON.parse(localStorage["pollResults"]);
+        writeResultsInGoogleSheets(pollResults, -1);
         localStorage["pollResults"] = JSON.stringify({});
-        //TODO Delete from airtable
         startSurvey();
     }
 
@@ -249,14 +260,14 @@ async function appApplicationName(containerId, quizDataUrl) {
                 return;
             }
 
-            fetch('', {
+            fetch(reportTableURL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: 'feedback=' + encodeURIComponent(feedback)
-            }).then(response => {
+            }).then(_ => {
                 alert('Report has successefully sent!');
                 popUp.classList.remove('show');
             }).catch(error => {
@@ -265,6 +276,32 @@ async function appApplicationName(containerId, quizDataUrl) {
         };        
         popUpContent.appendChild(feedbackForm);
         popUpContent.appendChild(submitButton);
+    }
+
+    async function updateGoogleSheets(option, voteValue) {
+        const url = resultsTableURL;
+        const data = {
+            option: option,
+            voteValue: voteValue
+        };
+    
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                console.log('Data updated successfully!');
+            } else {
+                console.error('Error updating data:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error updating data:', error);
+        }
     }
 
 
