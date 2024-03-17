@@ -107,23 +107,25 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         resultsElement.textContent = 'Survey Results:';
         container.appendChild(resultsElement);
     
-        // Read from Airtable
-        let pollResults = JSON.parse(localStorage["pollResults"]);
-        console.log(pollResults);
+        //var res = getSurveyResultsFromGoogleSheets();
+        var res = '[{"option":"Red","count":0},{"option":"Blue","count":0},{"option":"Green","count":0},{"option":"Black","count":1},{"option":"Total","count":1}]';
+        //console.log(res);
+        var data = JSON.parse(res);
+
         const resultList = document.createElement('ul');
-        let totalCount = 0;
-        Object.values(pollResults).forEach(num => {
-            totalCount += num;
-        })
-        Object.entries(results).forEach(([option, res]) => {
-            const resultItem = document.createElement('li');
-            const percentage = totalCount == 0 ? 0 : Math.round(res / totalCount * 100);
-            if (pollResults[option] !== 0) {
-                resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
-            } else {
-                resultItem.textContent = `${option}: ${percentage}%`;
+        const totalCount = data.find(opt => opt.option === 'Total').count;
+
+        data.forEach(({ option, count }) => {
+            if (option !== "Total") {
+                const resultItem = document.createElement('li');
+                const percentage = totalCount === 0 ? 0 : Math.round(count / totalCount * 100);
+                if (results[option] !== 0) {
+                    resultItem.innerHTML = `<strong>${option}: ${percentage}%</strong>`;
+                } else {
+                    resultItem.textContent = `${option}: ${percentage}%`;
+                }
+                resultList.appendChild(resultItem);
             }
-            resultList.appendChild(resultItem);
         });
         container.appendChild(resultList);
     }
@@ -286,7 +288,7 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
         };
     
         try {
-            const response = await fetch(url, {
+            const _ = await fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
@@ -294,15 +296,27 @@ async function appApplicationName(containerId, quizDataUrl, reportTableURL, resu
                 },
                 body: JSON.stringify(data)
             });
-            if (response.ok) {
-                console.log('Data updated successfully!');
-            } else {
-                console.error('Error updating data:', response.statusText);
-            }
         } catch (error) {
             console.error('Error updating data:', error);
         }
     }
 
+    async function getSurveyResultsFromGoogleSheets() {
+        const url = resultsTableURL;
+        try {
+            const response = await fetch(url, {
+                mode: 'no-cors',
+                });
+            console.log(response);
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                console.error('Error_ getting survey results:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error getting survey results:', error);
+        }
+    }
 
 }
