@@ -211,8 +211,8 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             }
         });
 
-        document.getElementById("export-csv").addEventListener("click", exportCSV);
-        document.getElementById("export-json").addEventListener("click", exportJSON);
+        container.querySelector("#export-csv").addEventListener("click", exportCSV);
+        container.querySelector("#export-json").addEventListener("click", exportJSON);       
     
         async function exportCSV() {
             let data = await getSurveyResultsFromGoogleSheets();
