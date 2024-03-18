@@ -94,7 +94,6 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             pollResults[option.value] = res;
         });
         localStorage[prefix] = JSON.stringify(pollResults);
-        console.log(localStorage[prefix]);
         await displayResults(pollResults);
         await writeResultsInGoogleSheets(pollResults, 1);
         await showCancelButton();
@@ -228,6 +227,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            alert("Download comlete");
         }
     
         async function exportJSON() {
@@ -240,6 +240,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            alert("Download comlete");
         }
     }
     
