@@ -1,0 +1,8 @@
+{
+    "question": "Yes?",
+    "type" : "Multiple choice",
+    "options": [
+        "Yes",
+        "No"
+    ]
+}
