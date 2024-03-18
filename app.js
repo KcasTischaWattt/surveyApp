@@ -1,5 +1,7 @@
 async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTableURL) {
     const container = document.getElementById(containerId);
+    const prefix = containerId + "pollResults";
+
 
     async function loadSurveyFromJSON() {
         try {
@@ -54,11 +56,11 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                     optionsElement.appendChild(optionItem);
                 });
                 container.appendChild(optionsElement);
-                if (!("pollResults" in localStorage)) {
-                    localStorage["pollResults"] = JSON.stringify({});
+                if (!(prefix in localStorage)) {
+                    localStorage[prefix] = JSON.stringify({});
                 }
 
-                let pollResults = JSON.parse(localStorage["pollResults"]);
+                let pollResults = JSON.parse(localStorage[prefix]);
                 let totalCount = 0;
                 if (pollResults != {}) {
                     Object.values(pollResults).forEach( num => {
@@ -83,15 +85,16 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
     }
 
     async function calculateResults() {
-        const options_ = document.querySelectorAll('input[name="answer"]');
-        let pollResults = JSON.parse(localStorage["pollResults"]);
+        const options_ = document.getElementById(containerId).querySelectorAll('input[name="answer"]');
+        let pollResults = JSON.parse(localStorage[prefix]);
         let sum = 0;
         options_.forEach(option => {
             const res = option.checked ? 1 : 0;
             sum += res;
             pollResults[option.value] = res;
         });
-        localStorage["pollResults"] = JSON.stringify(pollResults);
+        localStorage[prefix] = JSON.stringify(pollResults);
+        console.log(localStorage[prefix]);
         await displayResults(pollResults);
         await writeResultsInGoogleSheets(pollResults, 1);
         await showCancelButton();
@@ -116,7 +119,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
         resultList.className = 'my_ul';
 
         let totalCount = 0;
-        let pollResults = JSON.parse(localStorage["pollResults"]);
+        let pollResults = JSON.parse(localStorage[prefix]);
 
         data.forEach(({ _, count }) => {
             totalCount += count;
@@ -169,11 +172,11 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
     }
 
     function cancelButtonFunc() {
-        let pollResults = JSON.parse(localStorage["pollResults"]);
+        let pollResults = JSON.parse(localStorage[prefix]);
         let sum = 0;
         Object.values(pollResults).forEach(val => sum += val);
         writeResultsInGoogleSheets(pollResults, -1);
-        localStorage["pollResults"] = JSON.stringify({});
+        localStorage[prefix] = JSON.stringify({});
         startSurvey();
     }
 
@@ -207,7 +210,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                 exportDropdownContent.classList.remove('show');
             }
         });
-    
+
         document.getElementById("export-csv").addEventListener("click", exportCSV);
         document.getElementById("export-json").addEventListener("click", exportJSON);
     
