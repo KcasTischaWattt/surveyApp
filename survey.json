@@ -1,6 +1,6 @@
 {
     "question": "What is your favorite color?",
-    "type" : "Single answer",
+    "type" : "Multiple choice",
     "options": [
         "Red",
         "Blue",

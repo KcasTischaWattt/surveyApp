@@ -38,13 +38,13 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
                         const radio = document.createElement('input');
                         radio.className = 'myinput';
                         radio.type = "radio";
-                        radio.name = "answer";
+                        radio.name = containerId + "answer";
                         radio.value = option;
                         label.appendChild(radio);
                     } else if (surveyData.type === "Multiple choice") {
                         const checkbox = document.createElement('input');
                         checkbox.type = "checkbox";
-                        checkbox.name = "answer";
+                        checkbox.name = containerId + "answer";
                         checkbox.value = option;
                         label.appendChild(checkbox);
                     }
@@ -85,7 +85,7 @@ async function appSurveyApp(containerId, quizDataUrl, reportTableURL, resultsTab
     }
 
     async function calculateResults() {
-        const options_ = document.getElementById(containerId).querySelectorAll('input[name="answer"]');
+        const options_ = container.querySelectorAll(`input[name="${containerId}answer"]`);
         let pollResults = JSON.parse(localStorage[prefix]);
         let sum = 0;
         options_.forEach(option => {
